@@ -385,6 +385,7 @@ Car Thing kiosk ⇄ nocturned :5000 ⇄ [emulator bridge │ Bluetooth → Noctu
 | `webpage/` | The Mac control page (React + Tailwind). |
 | `emulator/` | Firmware extraction, static server, mock nocturned, faceplate, `claude.*` bridge. |
 | `mac/` | `install.sh`, `uninstall.sh`, LaunchAgent template, and `Nocturne/` — the vendored macOS connector with the `claude.*` relay. |
+| `windows/connector/` | A Node relay for PCs with no Mac at all: reads/writes the "Standard Serial over Bluetooth link" COM port Windows creates for the paired Car Thing instead of a native Bluetooth socket, speaking the same chunk/msgpack wire format as the Mac connector. `npm start` (daemon must already be running); COM port via `CLAUDE_THING_WIN_COM_PORT` (default `COM4`). No autostart yet — run it by hand alongside `npm --prefix daemon start`. |
 | `patches/` | An optional nocturne-ui menu entry. Everything else is tracked source now. |
 | `scripts/` | Firmware injection, the DMG builder, `test-all.sh`. |
 | `protocol/claude-protocol.md` | The `claude.*` contract — the single source of truth. |

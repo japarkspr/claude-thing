@@ -1,0 +1,20 @@
+{
+  "name": "claude-thing-windows-connector",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Windows connector: relays claude.* between the Car Thing (Bluetooth SPP COM port) and the daemon's ws://127.0.0.1:8790/ws hub",
+  "engines": {
+    "node": ">=18"
+  },
+  "scripts": {
+    "start": "node src/index.js",
+    "test": "node --test"
+  },
+  "dependencies": {
+    "@msgpack/msgpack": "^3.0.0",
+    "buffer-crc32": "^1.0.0",
+    "serialport": "^12.0.0",
+    "ws": "^8.18.0"
+  }
+}
