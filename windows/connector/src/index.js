@@ -38,10 +38,12 @@ const wire = openWire(COM_PORT, {
   onOpen: () => {
     wireUp = true;
     log(`${COM_PORT} opened, waiting for daemon.ready`);
+    daemon.pushStatus();
   },
   onError: (err) => {
     wireUp = false;
     log(`${COM_PORT} error — ${err.message}`);
+    daemon.pushStatus();
   },
   onMessage: (msg) => handleDeviceMessage(msg).catch((err) => log(`handler crashed: ${err.stack}`)),
 });

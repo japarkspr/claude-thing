@@ -81,6 +81,7 @@ export function connectDaemon(url, { onEvent, log }) {
 
   return {
     call,
+    pushStatus,
     setStatusProvider: (fn) => { statusProvider = fn; },
     isConnected: () => connected,
   };
