@@ -8,7 +8,10 @@ import { openWire } from './wire.js';
 import { connectDaemon } from './daemon-link.js';
 import { buildDeviceMethods, appReadyData } from './device-methods.js';
 
-const COM_PORT = process.env.CLAUDE_THING_WIN_COM_PORT || 'COM4';
+// A hint, not a guarantee — Windows can carry live traffic on a different
+// "Standard Serial over Bluetooth link" port than this across a re-pair, so
+// wire.js races every candidate on each connect rather than trusting it.
+const PREFERRED_COM_PORT = process.env.CLAUDE_THING_WIN_COM_PORT || 'COM4';
 const DAEMON_URL = process.env.CLAUDE_THING_DAEMON_URL || 'ws://127.0.0.1:8790/ws';
 
 const start = Date.now();
@@ -18,6 +21,7 @@ function log(msg) {
 
 const deviceMethods = buildDeviceMethods({ log });
 let wireUp = false;
+let livePort = null;
 let readyReplied = false;
 
 const daemon = connectDaemon(DAEMON_URL, {
@@ -30,19 +34,21 @@ const daemon = connectDaemon(DAEMON_URL, {
 daemon.setStatusProvider(() => ({
   connected: wireUp,
   device: wireUp ? 'Car Thing' : undefined,
-  address: COM_PORT,
+  address: livePort || PREFERRED_COM_PORT,
 }));
 
-const wire = openWire(COM_PORT, {
+const wire = openWire(PREFERRED_COM_PORT, {
   log,
-  onOpen: () => {
+  onOpen: (path) => {
     wireUp = true;
-    log(`${COM_PORT} opened, waiting for daemon.ready`);
+    livePort = path;
+    readyReplied = false; // a fresh connect gets a fresh daemon.ready/app.ready round trip
+    log(`${path} opened and confirmed live`);
     daemon.pushStatus();
   },
   onError: (err) => {
     wireUp = false;
-    log(`${COM_PORT} error — ${err.message}`);
+    log(`link error — ${err.message}`);
     daemon.pushStatus();
   },
   onMessage: (msg) => handleDeviceMessage(msg).catch((err) => log(`handler crashed: ${err.stack}`)),
